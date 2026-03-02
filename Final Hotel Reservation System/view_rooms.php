@@ -1,28 +1,20 @@
 <?php
 include "db_connect.php";
-
-$query = "SELECT r.id, g.first_name, g.last_name,
-          r.check_in_date, r.check_out_date,
-          r.number_of_guests, r.total_price, r.booking_status
-          FROM reservations r
-          JOIN guests g ON r.guest_id = g.id
-          ORDER BY r.created_at DESC";
-
-$result = mysqli_query($conn, $query);
+$sql = "SELECT * FROM rooms ORDER BY created_at DESC";
+$result = mysqli_query($conn, $sql);
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>View Reservations</title>
+<title>View Rooms</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
 body{display:flex;background:#f4f6f9;}
 
-/* Sidebar */
 .sidebar{
     width:250px;height:100vh;
     background:linear-gradient(135deg,#1e3c72,#2a5298);
@@ -38,7 +30,6 @@ body{display:flex;background:#f4f6f9;}
     transform:translateX(5px);
 }
 
-/* Main */
 .main-content{margin-left:250px;padding:40px;width:100%;}
 .header{
     display:flex;justify-content:space-between;
@@ -59,22 +50,20 @@ body{display:flex;background:#f4f6f9;}
 
 table{width:100%;border-collapse:collapse;}
 th,td{padding:14px;text-align:left;font-size:14px;}
-th{background:#f0f2f7;font-weight:600;}
+th{background:#f0f2f7;}
 tr{border-bottom:1px solid #eee;}
 tr:hover{background:#f9fbff;}
 
-/* Status badges */
-.status{
+.badge{
     padding:6px 12px;
     border-radius:20px;
     font-size:12px;
     font-weight:500;
 }
-.pending{background:#fff3cd;color:#856404;}
-.confirmed{background:#d4edda;color:#155724;}
-.cancelled{background:#f8d7da;color:#721c24;}
+.available{background:#d4edda;color:#155724;}
+.occupied{background:#f8d7da;color:#721c24;}
+.maintenance{background:#fff3cd;color:#856404;}
 
-/* Buttons */
 .btn{
     padding:6px 12px;
     border-radius:6px;
@@ -84,7 +73,6 @@ tr:hover{background:#f9fbff;}
 }
 .edit{background:#ffc107;color:#000;}
 .delete{background:#dc3545;color:white;}
-
 </style>
 </head>
 
@@ -101,19 +89,17 @@ tr:hover{background:#f9fbff;}
 <div class="main-content">
 
     <div class="header">
-        <h2>Reservation List</h2>
-        <a href="add_reservations.php" class="add-btn">+ Add Reservation</a>
+        <h2>Room List</h2>
+        <a href="add_rooms.php" class="add-btn">+ Add Room</a>
     </div>
 
     <div class="card">
         <table>
             <tr>
                 <th>ID</th>
-                <th>Guest</th>
-                <th>Check-in</th>
-                <th>Check-out</th>
-                <th>Guests</th>
-                <th>Total</th>
+                <th>Room Number</th>
+                <th>Type</th>
+                <th>Price</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -121,21 +107,19 @@ tr:hover{background:#f9fbff;}
             <?php while ($row = mysqli_fetch_assoc($result)): ?>
             <tr>
                 <td><?= $row['id'] ?></td>
-                <td><?= $row['first_name'].' '.$row['last_name'] ?></td>
-                <td><?= $row['check_in_date'] ?></td>
-                <td><?= $row['check_out_date'] ?></td>
-                <td><?= $row['number_of_guests'] ?></td>
-                <td>₱<?= number_format($row['total_price'],2) ?></td>
+                <td><?= $row['room_number'] ?></td>
+                <td><?= $row['room_type'] ?></td>
+                <td>₱<?= number_format($row['room_price'],2) ?></td>
                 <td>
-                    <span class="status <?= strtolower($row['booking_status']) ?>">
-                        <?= $row['booking_status'] ?>
+                    <span class="badge <?= strtolower($row['room_status']) ?>">
+                        <?= $row['room_status'] ?>
                     </span>
                 </td>
                 <td>
-                    <a class="btn edit" href="edit_reservations.php?id=<?= $row['id'] ?>">Edit</a>
+                    <a class="btn edit" href="edit_rooms.php?id=<?= $row['id'] ?>">Edit</a>
                     <a class="btn delete"
-                       href="delete_reservations.php?id=<?= $row['id'] ?>"
-                       onclick="return confirm('Delete this reservation?');">
+                       href="delete_rooms.php?id=<?= $row['id'] ?>"
+                       onclick="return confirm('Delete this room?');">
                        Delete
                     </a>
                 </td>
